@@ -12,7 +12,7 @@ export default function MainContent() {
         setLoading(true);
         setError(null);
 
-        const url = `${process.env.REACT_APP_API_URL}/api/maps-search/?textQuery=${encodeURIComponent(textQuery)}`;
+        const url = `${process.env.VITE_API_URL}/api/maps-search/?textQuery=${encodeURIComponent(textQuery)}`;
 
         fetch(url)
             .then(response => {
