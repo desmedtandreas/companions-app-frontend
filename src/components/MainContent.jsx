@@ -65,6 +65,7 @@ export default function MainContent() {
                                     <input type="checkbox" />
                                 </th>
                                 <th>Naam</th>
+                                <th>Bedrijfsnaam</th>
                                 <th>Adres</th>
                                 <th>BTW Nummer</th>
                                 <th className='small'>Website</th>
@@ -83,6 +84,7 @@ export default function MainContent() {
                                         <input type="checkbox" />
                                     </td>
                                     <td>{result.name}</td>
+                                    <td>{result.company_name || '-'}</td>
                                     <td>{result.address}</td>
                                     <td>{result.vat_number || '-'}</td>
                                     <td className='small'>{result.website || '-'}</td>
