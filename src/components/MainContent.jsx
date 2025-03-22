@@ -34,7 +34,6 @@ export default function MainContent() {
     return (
         <main>
             <h1>Maps Company Search</h1>
-            <p>{import.meta.env.VITE_API_URL}</p>
             <div className="search-header">
                 <div>
                     <p>Zoekwoorden</p>
