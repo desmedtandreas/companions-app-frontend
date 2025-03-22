@@ -12,7 +12,7 @@ export default function MainContent() {
         setLoading(true);
         setError(null);
 
-        const url = `${import.meta.env.VITE_API_URL}/api/maps-search/?textQuery=${encodeURIComponent(textQuery)}`;
+        const url = `${import.meta.env.VITE_API_URL}api/maps-search/?textQuery=${encodeURIComponent(textQuery)}`;
 
         fetch(url)
             .then(response => {
