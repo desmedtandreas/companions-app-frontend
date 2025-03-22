@@ -12,7 +12,7 @@ export default function MainContent() {
         setLoading(true);
         setError(null);
 
-        const url = `${import.meta.env.VITE_API_URL}api/maps-search/?textQuery=${encodeURIComponent(textQuery)}`;
+        const url = `${import.meta.env.VITE_API_URL}api/maps-search/?textQuery=${encodeURIComponent(textQuery + ' belgië')}`;
 
         fetch(url)
             .then(response => {
@@ -41,7 +41,7 @@ export default function MainContent() {
                         className="field"
                         type="text"
                         placeholder="aannemer, bouwbedrijf, ..."
-                        value={textQuery + 'belgië'}
+                        value={textQuery}
                         onChange={(e) => setTextQuery(e.target.value)}
                     />
                 </div>
