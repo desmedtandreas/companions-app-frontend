@@ -41,16 +41,9 @@ export default function MainContent() {
                         className="field"
                         type="text"
                         placeholder="aannemer, bouwbedrijf, ..."
-                        value={textQuery}
+                        value={textQuery + 'belgië'}
                         onChange={(e) => setTextQuery(e.target.value)}
                     />
-                </div>
-                <div>
-                    <p>Locatie</p>
-                    <select className="field" value={location} onChange={(e) => setLocation(e.target.value)}>
-                        <option value="option1">Vlaanderen</option>
-                        <option value="option2">België</option>
-                    </select>
                 </div>
                 <div>
                     <button type="button" onClick={handleSearch}>
