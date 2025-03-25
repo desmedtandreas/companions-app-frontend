@@ -173,7 +173,7 @@ td > div > p {
 
 .add-vat-btn {
   display: block;
-  width: 40px;
+  width: 85px;
   height: 100%;
   background-color: #2ecb53b8;
   color: white;
@@ -188,4 +188,39 @@ td > div > p {
 
 .add-vat-btn:hover {
   background-color: #29b242;
+}
+
+.input-vat-wrapper {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  min-width: 180px;
+}
+
+.input-vat {
+  padding: 5px 8px;
+  font-size: 0.8rem;
+  border-radius: 8px;
+  border: 1px solid #ccccccb4;
+  width: 100px;
+}
+
+.input-vat-confirm {
+  background-color: #2ecb53b8; /* green confirm */
+  margin-left: 4px;
+  color: white;
+  padding: 4px 6px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.input-vat-cancel {
+  background-color: #f44336; /* red cancel */
+  margin-left: 4px;
+  color: white;
+  padding: 4px 6px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
 }

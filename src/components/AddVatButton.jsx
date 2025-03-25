@@ -13,16 +13,16 @@ export default function AddVatButton({ placeId, onSubmit }) {
 
   if (editing) {
     return (
-      <div style={{ display: 'flex', gap: '5px' }}>
+      <div className='vat-wrapper'>
         <input
           type="text"
           value={vatValue}
           onChange={(e) => setVatValue(e.target.value)}
           placeholder="VAT number"
-          style={{ padding: '5px', fontSize: '0.9rem', width: '120px' }}
+          className='input-vat'
         />
-        <button onClick={handleSubmit}>✔</button>
-        <button onClick={() => setEditing(false)}>✖</button>
+        <button className='input-vat-confirm' onClick={handleSubmit}>✔</button>
+        <button className='input-vat-cancel' onClick={() => setEditing(false)}>✖</button>
       </div>
     );
   }
