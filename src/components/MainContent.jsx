@@ -1,10 +1,11 @@
 
 import React, { useState } from 'react';
+import AddVatButton from './AddVatButton';
 
 export default function MainContent() {
     const [textQuery, setTextQuery] = useState('');
     const [location, setLocation] = useState('option1');
-    const [results, setResults] = useState([]);
+    const [places, setPlaces] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
@@ -22,7 +23,7 @@ export default function MainContent() {
                 return response.json();
             })
             .then(data => {
-                setResults(data);
+                setPlaces(data);
                 setLoading(false);
             })
             .catch(err => {
@@ -31,11 +32,51 @@ export default function MainContent() {
             });
     };
 
+    const handleVatSubmit = async (placeId, vatValue) => {
+        try {
+          const response = await fetch(`${import.meta.env.VITE_API_URL}api/maps/set-vat/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              vat_number: vatValue,
+              place_id: placeId,
+              text_query: textQuery + 'belgië',
+            }),
+          });
+      
+          if (!response.ok) {
+            throw new Error('Failed to set VAT');
+          }
+      
+          const updatedData = await response.json();
+      
+          // Find index of the place we're updating
+          const index = places.findIndex((p) => p.place_id === placeId);
+          if (index === -1) return;
+      
+          // Merge only the fields you want to update
+          const updatedPlace = {
+            ...places[index],
+            vat_number: updatedData.vat_number,
+            company_name: updatedData.company_name,
+            company_id: updatedData.company_id,
+          };
+      
+          const newPlaces = [...places];
+          newPlaces[index] = updatedPlace;
+          setPlaces(newPlaces);
+      
+        } catch (error) {
+          console.error('Error updating VAT:', error);
+          setError(error);
+        }
+    };
+
     return (
         <main>
             <h1>Maps Company Search</h1>
             <div className="search-header">
-                <div>
+                <div className="field-container">
                     <p>Zoekwoorden</p>
                     <input
                         className="field"
@@ -65,30 +106,42 @@ export default function MainContent() {
                                     <input type="checkbox" />
                                 </th>
                                 <th>Naam</th>
-                                <th>Bedrijfsnaam</th>
                                 <th>Adres</th>
                                 <th>BTW Nummer</th>
                                 <th className='small'>Website</th>
-                                <th className='rating'>Rating</th>
+                                <th className='rating-cell'>Rating</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {!loading && results.length === 0 && (
+                            {!loading && places.length === 0 && (
                                 <tr>
                                     <td colSpan="6">Geen resultaten gevonden.</td>
                                 </tr>
                             )}
-                            {results.map((result, index) => (
+                            {places.map((place, index) => (
                                 <tr key={index}>
                                     <td className="checkbox">
                                         <input type="checkbox" />
                                     </td>
-                                    <td>{result.name}</td>
-                                    <td>{result.company_name || '-'}</td>
-                                    <td>{result.address}</td>
-                                    <td>{result.vat_number || '-'}</td>
-                                    <td className='small'>{result.website || '-'}</td>
-                                    <td className='rating'><div /></td>
+                                    <td>
+                                        <div>
+                                            <p className='table-companyname'>{place.company_name || '-'}</p>
+                                            <p>{place.name}</p>
+                                        </div>
+                                    </td>
+                                    <td>{place.address}</td>
+                                    <td className='vat-cell'>
+                                    {place.vat_number ? (
+                                        place.vat_number
+                                    ) : (
+                                        <AddVatButton
+                                            placeId={place.place_id}
+                                            onSubmit={handleVatSubmit}
+                                        />
+                                    )}
+                                    </td>
+                                    <td className='small'>{place.website || '-'}</td>
+                                    <td className='rating-cell'><div className='rating'/></td>
                                 </tr>
                             ))}
                         </tbody>

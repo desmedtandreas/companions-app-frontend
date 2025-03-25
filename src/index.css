@@ -42,7 +42,11 @@ main {
 }
 
 .search-header > div {
-  margin-right: 30px;
+  margin-right: 20px;
+}
+
+.field-container {
+  width: 30%;
 }
 
 .search-header .field {
@@ -105,7 +109,18 @@ main {
   text-overflow: ellipsis;
 }
 
-td div {
+td.small {
+  max-width: 50px;
+}
+
+.rating-cell {
+  text-align: center;
+  vertical-align: middle;
+  box-sizing: border-box;
+  width: 20px;
+}
+
+.rating {
   display: inline-block;
   color: rgba(255, 255, 255, 0);
   background-color: rgba(40, 213, 13, 0.743);
@@ -114,21 +129,20 @@ td div {
   border-radius: 14px;
 }
 
-td.small {
-  max-width: 50px;
-}
-
-table .rating {
-  text-align: center;
-  vertical-align: middle;
-  box-sizing: border-box;
-  width: 20px;
-}
-
 table .checkbox {
   box-sizing: border-box;
   width: 10px;
   padding: 5px
+}
+
+td > div > p {
+  margin: 3px 0;
+  font-size: 0.7rem;
+}
+
+.table-companyname {
+  font-weight: 600;
+  font-size: 0.8rem;
 }
 
 .spinner-container {
@@ -150,4 +164,28 @@ table .checkbox {
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+.vat-cell {
+  padding: 0;
+  margin: 0;
+}
+
+.add-vat-btn {
+  display: block;
+  width: 40px;
+  height: 100%;
+  background-color: #2ecb53b8;
+  color: white;
+  font-size: 1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  box-sizing: border-box;
+  transition: background-color 0.3s ease;
+}
+
+.add-vat-btn:hover {
+  background-color: #29b242;
 }
