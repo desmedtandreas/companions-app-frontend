@@ -8,6 +8,7 @@ export default function MainContent() {
     const [location, setLocation] = useState('option1');
     const [places, setPlaces] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [loadingMore, setLoadingMore] = useState(false);
     const [error, setError] = useState(null);
 
     const handleSearch = () => {
@@ -38,7 +39,7 @@ export default function MainContent() {
     const handleLoadMore = () => {
         if (!nextPageToken) return;
 
-        setLoading(true);
+        setLoadingMore(true);
         setError(null);
 
         const url = `${import.meta.env.VITE_API_URL}api/maps/search/?textQuery=${encodeURIComponent(textQuery + 'belgië')}&nextPageToken=${encodeURIComponent(nextPageToken)}`;
@@ -50,15 +51,14 @@ export default function MainContent() {
                 }
                 return response.json();
             })
-
             .then(data => {
                 setPlaces([...places, ...data.places]);
                 setNextPageToken(data.nextPageToken || null);
-                setLoading(false);
+                setLoadingMore(false);
             })
             .catch(err => {
                 setError(err);
-                setLoading(false);
+                setLoadingMore(false);
             });
     };
 
@@ -130,7 +130,7 @@ export default function MainContent() {
             )}
 
             <div className="table-container">
-                {loading ? (
+                {loading && places.length === 0 ? (
                     <div className="spinner-container">
                         <div className="spinner"></div>
                     </div>
@@ -187,9 +187,14 @@ export default function MainContent() {
 
             <div className="load-more">
                 {nextPageToken && !loading && (
-                    <button className='small-button' type="button" onClick={handleLoadMore}>
-                        Meer laden...
-                    </button>
+                    loadingMore ? (
+                        <div className="spinner"></div>
+                    ) : (
+                        <button className='small-button' type="button" onClick={handleLoadMore}>
+                            Meer laden...
+                        </button>
+                    )
+
                 )}
             </div>
         </main>
