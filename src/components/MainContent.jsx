@@ -4,6 +4,7 @@ import AddVatButton from './AddVatButton';
 
 export default function MainContent() {
     const [textQuery, setTextQuery] = useState('');
+    const [nextPageToken, setNextPageToken] = useState(null);
     const [location, setLocation] = useState('option1');
     const [places, setPlaces] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -13,7 +14,8 @@ export default function MainContent() {
         setLoading(true);
         setError(null);
 
-        const url = `${import.meta.env.VITE_API_URL}api/maps/search/?textQuery=${encodeURIComponent(textQuery + 'belgië')}`;
+        const url = `${import.meta.env.VITE_API_URL}api/maps/search/?textQuery=${textQuery + 'belgië'}`;
+        console.log(url)
 
         fetch(url)
             .then(response => {
@@ -23,7 +25,35 @@ export default function MainContent() {
                 return response.json();
             })
             .then(data => {
-                setPlaces(data);
+                setPlaces(data.places);
+                setNextPageToken(data.nextPageToken || null);
+                setLoading(false);
+            })
+            .catch(err => {
+                setError(err);
+                setLoading(false);
+            });
+    };
+
+    const handleLoadMore = () => {
+        if (!nextPageToken) return;
+
+        setLoading(true);
+        setError(null);
+
+        const url = `${import.meta.env.VITE_API_URL}api/maps/search/?textQuery=${encodeURIComponent(textQuery + 'belgië')}&nextPageToken=${encodeURIComponent(nextPageToken)}`;
+
+        fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+
+            .then(data => {
+                setPlaces([...places, ...data.places]);
+                setNextPageToken(data.nextPageToken || null);
                 setLoading(false);
             })
             .catch(err => {
@@ -87,11 +117,17 @@ export default function MainContent() {
                     />
                 </div>
                 <div>
-                    <button type="button" onClick={handleSearch}>
+                    <button type='button' className="small-button" onClick={handleSearch}>
                         Zoeken
                     </button>
                 </div>
             </div>
+
+            {error && (
+                <div className="error">
+                    Er is een fout opgetreden: {error.message}
+                </div>
+            )}
 
             <div className="table-container">
                 {loading ? (
@@ -149,7 +185,13 @@ export default function MainContent() {
                 )}
             </div>
 
-            {error && <p className="error">Fout: {error.message}</p>}
+            <div className="load-more">
+                {nextPageToken && !loading && (
+                    <button className='small-button' type="button" onClick={handleLoadMore}>
+                        Meer laden...
+                    </button>
+                )}
+            </div>
         </main>
     );
 }

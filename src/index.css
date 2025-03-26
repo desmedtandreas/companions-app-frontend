@@ -15,6 +15,7 @@ header {
 header > h1 {
   margin: 0;
   font-size: 1.5rem;
+  cursor: pointer;
 }
 
 nav ul {
@@ -29,6 +30,7 @@ nav ul li {
   margin-left: 25px;
   background-color: #ffffff12;
   border-radius: 30px;
+  cursor: pointer;
 }
 
 main {
@@ -39,6 +41,7 @@ main {
 .search-header {
   display: flex;
   align-items: end;
+  margin-bottom: 18px;
 }
 
 .search-header > div {
@@ -63,7 +66,7 @@ main {
   font-size: 0.8rem;
 }
 
-.search-header button {
+.small-button {
   padding: 12px 20px;
   background-color: #21284f;
   color: white;
@@ -74,7 +77,7 @@ main {
 }
 
 .table-container {
-  margin-top: 35px;
+  margin-top: 18px;
   overflow-x: auto;
 }
 
@@ -166,6 +169,15 @@ td > div > p {
   100% { transform: rotate(360deg); }
 }
 
+.error {
+  padding: 15px;
+  background-color: rgba(255, 0, 0, 0.764);
+  color: white;
+  font-size: 1rem;
+  border-radius: 5px;
+
+}
+
 .vat-cell {
   padding: 0;
   margin: 0;
@@ -202,7 +214,7 @@ td > div > p {
   font-size: 0.8rem;
   border-radius: 8px;
   border: 1px solid #ccccccb4;
-  width: 100px;
+  width: 90px;
 }
 
 .input-vat-confirm {
@@ -223,4 +235,112 @@ td > div > p {
   border: none;
   border-radius: 8px;
   cursor: pointer;
+}
+
+.company-info-container {
+  margin-top: 20px;
+}
+
+.company-info-container > h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.company-info {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.company-info > div {
+  display: flex;
+  align-items: top;
+}
+
+.company-info > div > div {
+  margin-right: 75px;
+}
+
+.company-info p {
+  margin: 7px 0;
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 30px
+}
+
+.company-info p.info-title {
+  margin-bottom: 10px;
+  color: #00000087;
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+}
+
+.map-container {
+  width: 100%;
+  margin-right: 0px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  background-color: #f0f0f0;
+}
+
+.company-info-container {
+  margin: 35px 0;
+}
+
+.company-info-container > h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.company-info {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+  height: 175px;
+}
+
+.company-info > div {
+  display: flex;
+}
+
+.company-info > div > div {
+  margin-right: 75px;
+}
+
+.company-info p {
+  margin: 7px 0;
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 30px;
+}
+
+.company-info p.info-title {
+  margin-bottom: 13px;
+  color: #00000087;
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+}
+
+.company-info > div > div > p:last-of-type {
+  margin-bottom: 0;
+}
+
+.map-container {
+  margin-right: 0px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  background-color: #f0f0f0;
+  border-radius: 5px;
+}
+
+.load-more {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
 }
