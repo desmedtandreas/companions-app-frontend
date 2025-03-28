@@ -104,7 +104,7 @@ export default function MainContent() {
 
     return (
         <main>
-            <h1>Maps Company Search</h1>
+            <h1>Google Maps Zoeken</h1>
             <div className="search-header">
                 <div className="field-container">
                     <p>Zoekwoorden</p>

@@ -50,7 +50,7 @@ export default function CompanySearcher() {
 
     return (
         <main>
-            <h1>Maps Company Search</h1>
+            <h1>Bedrijf Zoeken</h1>
             <div className="search-header">
                 <div className="field-container">
                     <p>Zoekwoorden</p>
