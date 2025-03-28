@@ -35,15 +35,26 @@ export default function CompanySearcher() {
             });
     };
 
-    // Run search on load if there's a query in the URL
+    // Debounce search to avoid calling API too often
+    const [debouncedQuery, setDebouncedQuery] = useState(initialQuery);
     useEffect(() => {
-        if (initialQuery) {
-            fetchCompanies(initialQuery);
+        const timer = setTimeout(() => {
+            setDebouncedQuery(textQuery);
+        }, 500);  // Delay of 500ms after typing stops
+
+        return () => clearTimeout(timer);
+    }, [textQuery]);
+
+    // Fetch companies whenever debouncedQuery changes
+    useEffect(() => {
+        if (debouncedQuery !== initialQuery) {
+            navigate(`/company-search/?q=${debouncedQuery}`);
         }
-    }, []);
+        fetchCompanies(debouncedQuery);
+    }, [debouncedQuery, navigate, initialQuery]);
 
     const handleSearch = () => {
-        // Push query to URL
+        // Push query to URL on "search" button click
         navigate(`/company-search/?q=${textQuery}`);
         fetchCompanies(textQuery);
     };
@@ -59,7 +70,7 @@ export default function CompanySearcher() {
                         type="text"
                         placeholder="Naam of BTW nummer"
                         value={textQuery}
-                        onChange={(e) => setTextQuery(e.target.value)}
+                        onChange={(e) => setTextQuery(e.target.value)}  // Set text query as the user types
                     />
                 </div>
                 <div>
