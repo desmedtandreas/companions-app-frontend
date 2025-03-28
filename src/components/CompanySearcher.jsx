@@ -17,7 +17,12 @@ export default function CompanySearcher() {
         setLoading(true);
         setError(null);
 
-        const url = `${import.meta.env.VITE_API_URL}api/companies/search/?q=${query}`;
+        // Normalize input by removing "BE" and non-numeric characters
+        const normalizedQuery = normalizeCompanyNumber(query);
+
+        console.log('Normalized query:', normalizedQuery);
+
+        const url = `${import.meta.env.VITE_API_URL}api/companies/search/?q=${normalizedQuery}`;
         fetch(url)
             .then(response => {
                 if (!response.ok) {
@@ -33,6 +38,22 @@ export default function CompanySearcher() {
                 setError(err);
                 setLoading(false);
             });
+    };
+
+    // Normalize input: remove BE and non-numeric characters, then format as XXXX.XXX.XXX
+    const normalizeCompanyNumber = (query) => {
+        // Remove 'BE' and any non-numeric characters
+        let normalized = query.replace(/^BE/, '').replace(/\D/g, '');
+        // Format as XXXX.XXX.XXX (only when we have enough digits)
+  
+        if (normalized.length > 7) {
+            return normalized.slice(0,4) + '.' + normalized.slice(4, 7) + '.' + normalized.slice(7);
+
+        } else
+        if (normalized.length > 4) {
+            return normalized.slice(0, 4) + '.' + normalized.slice(4);
+        }
+        return normalized;
     };
 
     // Debounce search to avoid calling API too often
@@ -70,7 +91,10 @@ export default function CompanySearcher() {
                         type="text"
                         placeholder="Naam of BTW nummer"
                         value={textQuery}
-                        onChange={(e) => setTextQuery(e.target.value)}  // Set text query as the user types
+                        onChange={(e) => {
+                            const input = e.target.value;
+                            setTextQuery(input);
+                        }}  // Set text query as the user types
                     />
                 </div>
                 <div>
