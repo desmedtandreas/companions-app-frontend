@@ -4,27 +4,27 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 export default function CompanySearcher() {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
-
     const initialQuery = searchParams.get('q') || '';
     const [textQuery, setTextQuery] = useState(initialQuery);
     const [companies, setCompanies] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    const fetchCompanies = (query) => {
-        if (!query) return;
-
+    const fetchCompanies = (textQuery) => {
+        if (!textQuery) return;
+    
         setLoading(true);
         setError(null);
-
-        // Normalize input by removing "BE" and non-numeric characters
-
-        const url = `${import.meta.env.VITE_API_URL}api/companies/search/?q=${textQuery}`;
+    
+        const cleanedQuery = cleanQueryInput(textQuery);
+        const url = `${import.meta.env.VITE_API_URL}api/companies/search/?q=${cleanedQuery}`;
+        console.log("🔍 Fetching:", url);
+    
         fetch(url)
             .then(response => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
-                }
+                }53
                 return response.json();
             })
             .then(data => {
@@ -37,21 +37,22 @@ export default function CompanySearcher() {
             });
     };
 
-    // // Normalize input: remove BE and non-numeric characters, then format as XXXX.XXX.XXX
-    // const normalizeCompanyNumber = (query) => {
-    //     // Remove 'BE' and any non-numeric characters
-    //     let normalized = query.replace(/^BE/, '').replace(/\D/g, '');
-    //     // Format as XXXX.XXX.XXX (only when we have enough digits)
-  
-    //     if (normalized.length > 7) {
-    //         return normalized.slice(0,4) + '.' + normalized.slice(4, 7) + '.' + normalized.slice(7);
-
-    //     } else
-    //     if (normalized.length > 4) {
-    //         return normalized.slice(0, 4) + '.' + normalized.slice(4);
-    //     }
-    //     return normalized;
-    // };
+    const cleanQueryInput = (input) => {
+        let trimmed = input.trim();
+    
+        // Remove leading 'BE' (case-insensitive)
+        if (trimmed.toUpperCase().startsWith('BE')) {
+            trimmed = trimmed.slice(2);
+        }
+    
+        // If input is mostly digits (or only contains digits, spaces, and dots)
+        if (/^[\d\s.]+$/.test(trimmed)) {
+            // Remove all non-digit characters
+            trimmed = trimmed.replace(/\D/g, '');
+        }
+    
+        return trimmed;
+    };
 
     // Debounce search to avoid calling API too often
     const [debouncedQuery, setDebouncedQuery] = useState(initialQuery);
