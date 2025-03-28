@@ -18,11 +18,8 @@ export default function CompanySearcher() {
         setError(null);
 
         // Normalize input by removing "BE" and non-numeric characters
-        const normalizedQuery = normalizeCompanyNumber(query);
 
-        console.log('Normalized query:', normalizedQuery);
-
-        const url = `${import.meta.env.VITE_API_URL}api/companies/search/?q=${normalizedQuery}`;
+        const url = `${import.meta.env.VITE_API_URL}api/companies/search/?q=${textQuery}`;
         fetch(url)
             .then(response => {
                 if (!response.ok) {
@@ -40,21 +37,21 @@ export default function CompanySearcher() {
             });
     };
 
-    // Normalize input: remove BE and non-numeric characters, then format as XXXX.XXX.XXX
-    const normalizeCompanyNumber = (query) => {
-        // Remove 'BE' and any non-numeric characters
-        let normalized = query.replace(/^BE/, '').replace(/\D/g, '');
-        // Format as XXXX.XXX.XXX (only when we have enough digits)
+    // // Normalize input: remove BE and non-numeric characters, then format as XXXX.XXX.XXX
+    // const normalizeCompanyNumber = (query) => {
+    //     // Remove 'BE' and any non-numeric characters
+    //     let normalized = query.replace(/^BE/, '').replace(/\D/g, '');
+    //     // Format as XXXX.XXX.XXX (only when we have enough digits)
   
-        if (normalized.length > 7) {
-            return normalized.slice(0,4) + '.' + normalized.slice(4, 7) + '.' + normalized.slice(7);
+    //     if (normalized.length > 7) {
+    //         return normalized.slice(0,4) + '.' + normalized.slice(4, 7) + '.' + normalized.slice(7);
 
-        } else
-        if (normalized.length > 4) {
-            return normalized.slice(0, 4) + '.' + normalized.slice(4);
-        }
-        return normalized;
-    };
+    //     } else
+    //     if (normalized.length > 4) {
+    //         return normalized.slice(0, 4) + '.' + normalized.slice(4);
+    //     }
+    //     return normalized;
+    // };
 
     // Debounce search to avoid calling API too often
     const [debouncedQuery, setDebouncedQuery] = useState(initialQuery);
