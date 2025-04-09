@@ -1,79 +1,9 @@
-body {
-  margin: 0;
-  font-family: Inter, sans-serif;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #21284f;
-  padding: 30px 30px;
-  color: white;
-}
-
-header > h1 {
-  margin: 0;
-  font-size: 1.5rem;
-  cursor: pointer;
-}
-
-nav ul {
-  list-style: none;
-  display: flex;
-  margin: 0;
-  padding: 0;
-}
-
-nav ul li {
-  padding: 15px 25px;
-  margin-left: 25px;
-  background-color: #ffffff12;
-  border-radius: 30px;
-  cursor: pointer;
-}
-
-main {
-  max-width: 80%;
-  margin: 50px auto;
-}
-
-.search-header {
-  display: flex;
-  align-items: end;
-  margin-bottom: 30px;
-}
-
-.search-header > div {
-  margin-right: 20px;
-}
-
-.field-container {
-  width: 30%;
-}
-
-.search-header .field {
-  box-sizing: border-box;
-  padding: 10px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  width: 100%;
-  margin: 0px;
-}
-
-.search-header p {
-  margin: 10px 0;
-  font-size: 0.8rem;
-}
-
-.small-button {
-  padding: 12px 20px;
-  background-color: #21284f;
-  color: white;
-  border: none;
-  border-radius: 20px;
-  cursor: pointer;
-  align-items: end;
+:root {
+  --font-inter: 'Inter', sans-serif;
 }
 
 .table-container {
