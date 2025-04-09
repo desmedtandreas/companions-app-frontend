@@ -70,7 +70,7 @@ type Place = {
 
 type Props = {
   places: Place[];
-  onVatSubmit: (placeId: string, vatValue: string) => void;
+  onVatSubmit: (placeId: string, vatValue: string, website?: string) => void;
   rowSelection: Record<string, boolean>;
   setRowSelection: OnChangeFn<RowSelectionState>;
 };

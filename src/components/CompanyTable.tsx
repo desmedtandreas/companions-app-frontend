@@ -221,7 +221,7 @@ export default function CompanyTable({ companies, rowSelection, setRowSelection 
   });
 
   return (
-    <TableRoot className="mt-10 rounded-md shadow border-gray-100">
+    <TableRoot className="rounded-md shadow border-gray-100">
       <Table>
         <TableHead>
           {table.getHeaderGroups().map((headerGroup) => (

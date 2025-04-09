@@ -74,12 +74,13 @@ export default function MainContent() {
       });
   };
 
-  const handleVatSubmit = async (placeId: string, vatValue: string) => {
+  const handleVatSubmit = async (placeId: string, vatValue: string, website: string) => {
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}api/maps/set-vat/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          website: website,
           vat_number: vatValue,
           place_id: placeId,
           text_query: textQuery,

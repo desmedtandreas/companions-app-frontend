@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import CompanyTable from './CompanyTable';
+import { RiMenuAddFill } from '@remixicon/react';
 
 type Address = {
   street: string;
@@ -111,6 +112,26 @@ export default function CompanySearcher() {
           </button>
         </div>
       </div>
+
+      { Object.keys(rowSelection).length === 0 ? (
+        <div className='flex mt-10 mb-4'>
+          <div className='flex items-center text-sm text-gray-400 bg-gray-100 py-2 px-4 rounded-md shadow'>
+            <RiMenuAddFill className='ml-0 mr-3 h-4 w-4' />
+            Voeg toe aan lijst
+          </div>
+        </div>
+      ) : (
+        <div className='flex items-center mt-10 mb-4'>
+          <div className='flex items-center text-sm text-white bg-[#21284f] p-2 px-4 rounded-md shadow'>
+            <RiMenuAddFill className='mr-3 h-4 w-4 m-0' />
+            Voeg toe aan lijst
+          </div>
+          <p className='text-sm ml-4' >
+            {Object.keys(rowSelection).length} geselecteerde bedrij{Object.keys(rowSelection).length > 1 ? 'ven' : 'f'}
+          </p>
+        </div>
+      )}
+      
 
       {error && (
         <div className="error">
