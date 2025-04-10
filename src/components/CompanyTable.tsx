@@ -52,7 +52,10 @@ function IndeterminateCheckbox({
       type="checkbox"
       ref={ref}
       className={classNames(
-        'size-4 rounded border-tremor-border text-tremor-brand shadow-tremor-input focus:ring-tremor-brand-muted dark:border-dark-tremor-border dark:bg-dark-tremor-background dark:text-dark-tremor-brand dark:shadow-dark-tremor-input dark:focus:ring-dark-tremor-brand-muted',
+        'size-4 appearance-none rounded border border-gray-400',
+        'bg-white checked:bg-blue-600 checked:border-blue-600',
+        'indeterminate:bg-blue-600 indeterminate:border-blue-600',
+        'focus:outline-none focus:ring-0',
         className
       )}
       {...rest}
@@ -116,7 +119,7 @@ export default function CompanyTable({ companies, rowSelection, setRowSelection 
         enableSorting: false,
         meta: {
           align: 'text-left',
-          width: 'w-[15px] pr-5',
+          width: 'w-[35px] pr-5 overflow-hidden text-clip',
         },
       },
       columnHelper.accessor('name', {
@@ -124,15 +127,15 @@ export default function CompanyTable({ companies, rowSelection, setRowSelection 
         cell: (info) => {
           const row = info.row.original;
           return row.name ? (
-            <button
-              onClick={(e) => {
-                e.stopPropagation(); // prevent row toggle
-                navigate(`/company/${row.number}`);
-              }}
+            <a
+              href={`/company/${row.number}`}
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-left font-semibold w-full hover:underline focus:outline-none"
+              onClick={(e) => e.stopPropagation()} // prevent row click toggle
             >
               {row.name}
-            </button>
+            </a>
           ) : (
             '-'
           );

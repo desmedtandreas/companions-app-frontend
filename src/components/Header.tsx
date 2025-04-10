@@ -12,7 +12,7 @@ function Header() {
             <ul className="flex space-x-5">
               <li 
                 className="px-5 py-3 bg-white/5 rounded-full hover:bg-white/10 cursor-pointer"
-                onClick={() => window.location.href = '/'}
+                onClick={() => window.location.href = '/list-overview'}
               >
                 Lijsten
               </li>

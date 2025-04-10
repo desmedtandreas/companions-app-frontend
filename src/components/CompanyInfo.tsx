@@ -49,6 +49,7 @@ type Company = {
     legalform_short: string;
     start_date: string;
     fin_fetch: string;
+    website: string | null;
     tags: string[];
     addresses: Address[];
     administrators: Administrator[];
@@ -256,9 +257,16 @@ if (loading || !companyInfo) {
             <p className="text-sm text-gray-500 mb-1">Oprichting</p>
             <p className="font-medium">{companyInfo.start_date}</p>
           </div>
-          <div>
+          <div className="overflow-hidden text-ellipsis whitespace-nowrap">
             <p className="text-sm text-gray-500 mb-1">Website</p>
-            <p className="font-medium">www.company.be</p>
+            <a 
+              href={companyInfo.website || "#"} 
+              className="font-medium overflow-hidden text-ellipsis whitespace-nowrap" 
+              target="_blank" 
+              rel="noopener noreferrer"
+            >
+              {companyInfo.website || "-"}
+            </a>
           </div>
           <div className="row-span-2">
             <div className="max-w-[">

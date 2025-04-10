@@ -108,19 +108,24 @@ export default function PlacesTable({ places, onVatSubmit, rowSelection, setRowS
         header: 'Naam',
         cell: (info) => {
           const row = info.row.original;
-          return row.vat_number ? (
-            <button
-              onClick={(e) => {
-                e.stopPropagation(); // prevent row toggle
-                navigate(`/company/${row.vat_number}`);
-              }}
-              className="text-left font-medium w-full hover:underline focus:outline-none"
-            >
-              {row.company_name}
-            </button>
-          ) : (
-            '-'
-          );
+          const place = row.name ?? '-';
+        
+          if (row.vat_number) {
+            return (
+              <a
+                href={`/company/${row.vat_number}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-col text-left text-gray-700 font-medium w-full hover:underline focus:outline-none"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <span>{row.company_name}</span>
+                <span className="text-xs text-gray-400">{place}</span>
+              </a>
+            );
+          }
+        
+          return <span className="text-sm text-gray-400">{place}</span>;
         },
         meta: { align: 'text-left' },
       }),
@@ -148,7 +153,23 @@ export default function PlacesTable({ places, onVatSubmit, rowSelection, setRowS
       },
       columnHelper.accessor('website', {
         header: 'Website',
-        cell: (info) => info.getValue() || '-',
+        cell: (info) =>  {
+          const website = info.row.original.website;
+          if (website) {
+            return (
+              <a
+                href={website}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-grey-500 hover:underline"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {website}
+              </a>
+            );
+          }
+          return '-';
+        },
         meta: { 
           align: 'text-left',
           width: 'w-[200px]' 
