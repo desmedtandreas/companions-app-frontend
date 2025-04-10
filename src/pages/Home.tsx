@@ -7,7 +7,7 @@ function Home() {
             <div className="flex items-center mt-10 space-x-4 justify-center">
                 <button 
                     className="px-12 bg-blue-950 text-white rounded-full py-5 mt-10 hover:bg-blue-800 transition duration-300" 
-                    onClick={() => window.location.href = '/'}
+                    onClick={() => window.location.href = '/list-overview'}
                 >
                     Lijsten
                 </button>
