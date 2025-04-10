@@ -143,7 +143,7 @@ function List() {
     return (
         <Layout>
             <div className="flex justify-between items-center">
-                <h1 className="text-4xl font-semibold mt-12 mb-8">{list?.name || "Lijstnaam"}</h1>
+                <h1 className="text-4xl font-semibold mt-12 mb-8">{list?.name || "..."}</h1>
                 <div 
                     className="flex items-center pl-2 pr-3 h-9 bg-red-400 rounded-md shadow hover:bg-red-300 cursor-pointer"
                     onClick={() => setDeleteListDialogOpen(true)}
