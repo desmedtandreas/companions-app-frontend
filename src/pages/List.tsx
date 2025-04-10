@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { RiDeleteBin6Fill } from "@remixicon/react";
 import DeleteListDialog from "../components/DeleteListDialog";
+import DeleteCompanyDialog from "../components/DeleteCompanyDialog";
 import { useToast } from "../components/ToastProvider";
 import {
     Table,
@@ -59,7 +60,9 @@ export function formatDateTime(isoDate: string | undefined): string {
 
 function List() {
     const { slug } = useParams<RouteParams>();
-    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [deleteListDialogOpen, setDeleteListDialogOpen] = useState(false);
+    const [deleteCompanyDialogOpen, setDeleteCompanyDialogOpen] = useState(false);
+    const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
     const [list, setList] = useState<List>();
     const { showToast } = useToast();
 
@@ -86,12 +89,50 @@ function List() {
                 throw new Error("Failed to delete list");
             }
 
-            setDeleteDialogOpen(false);
+            setDeleteListDialogOpen(false);
+            window.location.href = "/list-overview";
             showToast("Lijst succesvol verwijderd", "success");
         } catch (error) {
             console.error("Error deleting list:", error);
         }
     };
+
+    const handleCompanyDelete = async (slug: string, companyNumber: string, companyName: string, onSuccess?: () => void) => {
+        try {
+          const response = await fetch(
+            `${import.meta.env.VITE_API_URL}api/lists/${slug}/remove-company/`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ company: companyNumber }),
+            }
+          );
+      
+          if (!response.ok) {
+            const errorData = await response.json();
+            showToast(
+              `Fout bij verwijderen uit lijst: ${errorData.message || "Onbekend"}`,
+              "error"
+            );
+            return;
+          }
+      
+          const data = await response.json();
+          showToast(
+            `Bedrijf "${companyName}" succesvol verwijderd uit de lijst.`,
+            "success"
+          );
+          setSelectedCompany(null);
+          fetchList(slug);
+            
+          if (onSuccess) onSuccess();
+        } catch (error) {
+            console.error("Error deleting company from list:", error);
+            showToast("Fout bij verwijderen uit lijst", "error");
+        }
+      };
 
     useEffect(() => {
         if (slug) {
@@ -105,7 +146,7 @@ function List() {
                 <h1 className="text-4xl font-semibold mt-12 mb-8">{list?.name || "Lijstnaam"}</h1>
                 <div 
                     className="flex items-center pl-2 pr-3 h-9 bg-red-400 rounded-md shadow hover:bg-red-300 cursor-pointer"
-                    onClick={() => setDeleteDialogOpen(true)}
+                    onClick={() => setDeleteListDialogOpen(true)}
                 >
                     <RiDeleteBin6Fill className='w-4 h-4 text-white mr-2 ml-0'/>
                     <span className='text-white text-xs font-medium'>Verwijder</span>
@@ -113,11 +154,24 @@ function List() {
             </div>
 
             <DeleteListDialog
-                open={deleteDialogOpen}
-                onOpenChange={setDeleteDialogOpen}
+                open={deleteListDialogOpen}
+                onOpenChange={setDeleteListDialogOpen}
                 listName={list?.name || ""}
                 onConfirm={() => list && handleDeleteList(list.slug)}
             />
+
+            <DeleteCompanyDialog
+                open={!!selectedCompany}
+                onOpenChange={(open: boolean) => {
+                    if (!open) {
+                        setSelectedCompany(null);
+                    }
+                }}
+                companyName={selectedCompany?.name || ""}
+                onConfirm={() => 
+                    list?.slug && selectedCompany?.number && handleCompanyDelete(list.slug, selectedCompany.number, selectedCompany.name)}
+            />
+
 
             <div className="grid grid-cols-4 gap-4 mt-4">
                 <div className="col-span-2">
@@ -165,11 +219,7 @@ function List() {
                                 <TableCell >
                                     <RiDeleteBin6Fill
                                         className='w-4 h-4 text-red-400 cursor-pointer hover:text-red-500'
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            e.stopPropagation();
-                                            setDeleteDialogOpen(true);
-                                        }}
+                                        onClick={() => setSelectedCompany(item.company)}
                                     />
                                 </TableCell>
                             </TableRow>
