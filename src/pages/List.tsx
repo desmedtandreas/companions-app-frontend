@@ -1,7 +1,7 @@
 import Layout from "../components/Layout";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { RiDeleteBin6Fill } from "@remixicon/react";
+import { RiDeleteBin6Fill, RiPencilFill } from "@remixicon/react";
 import DeleteListDialog from "../components/DeleteListDialog";
 import DeleteCompanyDialog from "../components/DeleteCompanyDialog";
 import UpdateListDialog from "../components/UpdateListDialog";
@@ -189,7 +189,7 @@ function List() {
                             setUpdateListDialogOpen(true);
                           }}
                     >
-                        <RiDeleteBin6Fill className='w-4 h-4 text-white mr-2 ml-0'/>
+                        <RiPencilFill className='w-4 h-4 text-white mr-2 ml-0'/>
                         <span className='text-white text-xs font-medium'>Bewerk</span>
                     </div>
                     <div 
