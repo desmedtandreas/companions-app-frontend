@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import { RiDeleteBin6Fill } from "@remixicon/react";
 import DeleteListDialog from "../components/DeleteListDialog";
 import DeleteCompanyDialog from "../components/DeleteCompanyDialog";
+import UpdateListDialog from "../components/UpdateListDialog";
 import { useToast } from "../components/ToastProvider";
 import {
     Table,
@@ -62,7 +63,10 @@ function List() {
     const { slug } = useParams<RouteParams>();
     const [deleteListDialogOpen, setDeleteListDialogOpen] = useState(false);
     const [deleteCompanyDialogOpen, setDeleteCompanyDialogOpen] = useState(false);
+    const [updateListDialogOpen, setUpdateListDialogOpen] = useState(false);
     const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
+    const [newListName, setNewListName] = useState("");
+    const [newListDescription, setNewListDescription] = useState("");
     const [list, setList] = useState<List>();
     const { showToast } = useToast();
 
@@ -78,6 +82,38 @@ function List() {
             console.error("Error fetching list:", error);
         }
     };
+
+    const handleUpdateList = async () => {
+        if (!newListName.trim()) {
+            return;
+        }
+    
+        try {
+            const rest = await fetch(`${import.meta.env.VITE_API_URL}api/lists/${slug}/`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    name: newListName,
+                    description: newListDescription,
+                }),
+            });
+    
+            if (rest.ok) {
+                showToast(`Lijst "${newListName}" bijgewerkt!`, 'success');
+                setNewListName("");
+                setNewListDescription("");
+                setUpdateListDialogOpen(false); // Assuming you have a separate dialog for updating
+                if (slug) fetchList(slug); // Refresh list data
+            } else {
+                const error = await rest.json();
+                showToast('Error updating list: ' + error.message, 'error');
+            }
+        } catch (error) {
+            console.error("Error updating list:", error);
+        }
+    };   
 
     const handleDeleteList = async (listId: string) => {
         try {
@@ -144,12 +180,25 @@ function List() {
         <Layout>
             <div className="flex justify-between items-center">
                 <h1 className="text-4xl font-semibold mt-12 mb-8">{list?.name || "..."}</h1>
-                <div 
-                    className="flex items-center pl-2 pr-3 h-9 bg-red-400 rounded-md shadow hover:bg-red-300 cursor-pointer"
-                    onClick={() => setDeleteListDialogOpen(true)}
-                >
-                    <RiDeleteBin6Fill className='w-4 h-4 text-white mr-2 ml-0'/>
-                    <span className='text-white text-xs font-medium'>Verwijder</span>
+                <div className="flex items-center space-x-2">
+                    <div 
+                        className="flex items-center pl-2 pr-3 h-9 bg-gray-400 rounded-md shadow hover:bg-gray-300 cursor-pointer"
+                        onClick={() => {
+                            setNewListName(list?.name || "");
+                            setNewListDescription(list?.description || "");
+                            setUpdateListDialogOpen(true);
+                          }}
+                    >
+                        <RiDeleteBin6Fill className='w-4 h-4 text-white mr-2 ml-0'/>
+                        <span className='text-white text-xs font-medium'>Bewerk</span>
+                    </div>
+                    <div 
+                        className="flex items-center pl-2 pr-3 h-9 bg-red-400 rounded-md shadow hover:bg-red-300 cursor-pointer"
+                        onClick={() => setDeleteListDialogOpen(true)}
+                    >
+                        <RiDeleteBin6Fill className='w-4 h-4 text-white mr-2 ml-0'/>
+                        <span className='text-white text-xs font-medium'>Verwijder</span>
+                    </div>
                 </div>
             </div>
 
@@ -172,6 +221,15 @@ function List() {
                     list?.slug && selectedCompany?.number && handleCompanyDelete(list.slug, selectedCompany.number, selectedCompany.name)}
             />
 
+            <UpdateListDialog
+                open={updateListDialogOpen}
+                onOpenChange={setUpdateListDialogOpen}
+                name={newListName}
+                description={newListDescription} 
+                onNameChange={setNewListName}
+                onDescriptionChange={setNewListDescription}
+                onUpdate={handleUpdateList}
+            />
 
             <div className="grid grid-cols-4 gap-4 mt-4">
                 <div className="col-span-2">
