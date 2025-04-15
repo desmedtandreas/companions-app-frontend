@@ -1,6 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import AddVatButton from './AddVatButton';
 import PlacesTable from './PlacesTable';
+import BatchButton from './BatchButton';
+import { useToast } from './ToastProvider';
+
+type List = {
+  id: string;
+  name: string;
+};
 
 type Place = {
   place_id: string;
@@ -22,6 +29,9 @@ export default function MainContent() {
   const [loadingMore, setLoadingMore] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
   const [rowSelection, setRowSelection] = useState({});
+  const [lists, setLists] = useState<List[]>([]);
+  const { showToast } = useToast();
+
 
   const handleSearch = () => {
     setLoading(true);
@@ -116,6 +126,57 @@ export default function MainContent() {
     }
   };
 
+  useEffect(() => {
+    fetch(`${import.meta.env.VITE_API_URL}api/lists/`)
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error('Failed to fetch lists');
+        }
+        return res.json();
+      })
+      .then((data) => {
+        // Convert from API format to expected shape for BatchButton
+        const formatted = data.map((list: any) => ({
+          id: list.slug,
+          name: list.name,
+        }));
+        setLists(formatted);
+      })
+      .catch((err) => {
+        console.error('Error fetching lists:', err);
+      });
+  }, []);
+
+  const handleAddToList = async (listId: string) => {
+    const selectedCompanyNumbers = Object.keys(rowSelection)
+      .map((rowId) => places[parseInt(rowId)]?.vat_number)
+      .filter(Boolean);
+  
+    if (selectedCompanyNumbers.length === 0) {
+      showToast('Geen bedrijven geselecteerd.', 'info');
+      return;
+    }
+  
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}api/lists/${listId}/add-companies/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ companies: selectedCompanyNumbers }),
+      });
+  
+      const data = await res.json();
+  
+      if (res.ok) {
+        showToast(`${data.added} bedrijven toegevoegd aan de lijst.`, 'success');
+      } else {
+        showToast('Fout bij toevoegen: ' + (data.error || 'Onbekende fout'), 'error');
+      }
+    } catch (err) {
+      console.error(err);
+      showToast('Verzoek mislukt.');
+    }
+  };
+
   return (
     <main className="">
       <h1 className="text-4xl font-semibold mt-12 mb-8">Google Maps Zoeken</h1>
@@ -161,6 +222,13 @@ export default function MainContent() {
         </div>
       </div>
       {error && <div className="error">Er is een fout opgetreden: {error.message}</div>}
+
+      <BatchButton 
+        rowSelection={rowSelection}
+        lists={lists}
+        onAdd={handleAddToList}
+      />
+
       <PlacesTable
           places={places}
           onVatSubmit={handleVatSubmit}

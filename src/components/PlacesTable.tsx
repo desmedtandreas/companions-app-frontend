@@ -85,9 +85,9 @@ export default function PlacesTable({ places, onVatSubmit, rowSelection, setRowS
         id: 'select',
         header: ({ table }) => (
           <IndeterminateCheckbox
-            checked={table.getIsAllRowsSelected()}
-            indeterminate={table.getIsSomeRowsSelected()}
-            onChange={table.getToggleAllRowsSelectedHandler() as (e: React.ChangeEvent<HTMLInputElement>) => void}
+            checked={table.getIsAllPageRowsSelected()}
+            indeterminate={table.getIsSomePageRowsSelected()}
+            onChange={table.getToggleAllPageRowsSelectedHandler() as (e: React.ChangeEvent<HTMLInputElement>) => void}
           />
         ),
         cell: ({ row }) => (
@@ -191,17 +191,17 @@ export default function PlacesTable({ places, onVatSubmit, rowSelection, setRowS
   const table = useReactTable({
     data: places,
     columns,
-    enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
+    enableRowSelection: (row) => !!row.original.vat_number,
     state: {
       rowSelection,
     },
   });
 
   return (
-    <TableRoot className="mt-10 rounded-md shadow border-gray-100">
+    <TableRoot className="rounded-md shadow border-gray-100">
       <Table>
         <TableHead>
           {table.getHeaderGroups().map((headerGroup) => (
