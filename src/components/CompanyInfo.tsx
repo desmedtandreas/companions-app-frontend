@@ -224,13 +224,17 @@ if (loading || !companyInfo) {
             {companyInfo.status}
           </Badge>
         </div>
+        {companyInfo.fin_fetch && (
         <div className='flex items-center'>
-          <span className='text-xs text-gray-400'>Laatste synchronisatie: {companyInfo.fin_fetch}</span>
+          <span className='text-xs text-gray-400'>
+            Laatste synchronisatie: {companyInfo.fin_fetch}
+          </span>
           <RiLoopLeftFill 
             className='w-4 h- ml-2 cursor-pointer text-green-500'
             onClick={syncFinancials}
           />
         </div>
+      )}
       </div>
       <div className="mt-10">
         <h3 className='text-l font-semibold'>Bedrijfsinformatie</h3>
