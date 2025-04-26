@@ -18,6 +18,7 @@ type List = {
 function ListOverview() {
     const [createDialogOpen, setCreateDialogOpen] = useState(false);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [listToDelete, setListToDelete] = useState<List | null>(null);
     const [lists, setLists] = useState<List[]>([]);
     const [newListName, setNewListName] = useState("");
     const [newListDescription, setNewListDescription] = useState("");
@@ -66,7 +67,6 @@ function ListOverview() {
             } else {
                 const error = await rest.json();
                 showToast('Error creating list: ' + error.message, 'error');
-                setDeleteDialogOpen(true);
             }
         } catch (error) {
             console.error("Error creating list:", error); 
@@ -105,16 +105,6 @@ function ListOverview() {
                 </div>
             </div>
 
-            <CreateListDialog
-                open={createDialogOpen}
-                onOpenChange={setCreateDialogOpen}
-                name={newListName}
-                description={newListDescription}
-                onNameChange={setNewListName}
-                onDescriptionChange={setNewListDescription}
-                onCreate={handleCreateList}
-            />
-
             <div className="grid grid-cols-3 gap-4 mt-5">
                 {lists.map((list) => (
                     <a key={list.id} className="p-4 bg-gray-50 border-gray-200 border-2 rounded-md shadow-lg" href={`/list/${list.slug}/`}>
@@ -125,15 +115,9 @@ function ListOverview() {
                                 onClick={(e) => {
                                     e.preventDefault();
                                     e.stopPropagation();
+                                    setListToDelete(list);
                                     setDeleteDialogOpen(true);
                                 }}
-                            />
-
-                            <DeleteListDialog
-                                open={deleteDialogOpen}
-                                onOpenChange={setDeleteDialogOpen}
-                                listName={list.name}
-                                onConfirm={() => handleDeleteList(list.id)}
                             />
                         </div>
 
@@ -145,6 +129,34 @@ function ListOverview() {
                     </a>
                 ))}
             </div>
+
+            <CreateListDialog
+                open={createDialogOpen}
+                onOpenChange={setCreateDialogOpen}
+                name={newListName}
+                description={newListDescription}
+                onNameChange={setNewListName}
+                onDescriptionChange={setNewListDescription}
+                onCreate={handleCreateList}
+            />
+
+            <DeleteListDialog
+            open={deleteDialogOpen}
+            onOpenChange={(open) => {
+                if (!open) {
+                setDeleteDialogOpen(false);
+                setListToDelete(null);
+                }
+            }}
+            listName={listToDelete?.name || ""}
+            onConfirm={() => {
+                if (listToDelete) {
+                handleDeleteList(listToDelete.slug);
+                setDeleteDialogOpen(false);
+                setListToDelete(null);
+                }
+            }}
+            />
             
         </Layout>
     );

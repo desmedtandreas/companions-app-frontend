@@ -33,55 +33,44 @@ export default function MainContent() {
   const { showToast } = useToast();
 
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
     setLoading(true);
     setError(null);
-
-    const url = `${import.meta.env.VITE_API_URL}api/maps/search/?textQuery=${textQuery}&location=${location}&radius=${radius}`;
-    console.log(url);
-
-    fetch(url)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+  
+    try {
+      const url = `${import.meta.env.VITE_API_URL}api/maps/search/?textQuery=${textQuery}`;
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+  
+      const firstData: { places: Place[]; nextPageToken?: string } = await response.json();
+      let allPlaces = [...firstData.places];
+      let currentToken = firstData.nextPageToken || null;
+  
+      // Keep loading more pages
+      while (currentToken) {
+        const nextUrl = `${import.meta.env.VITE_API_URL}api/maps/search/?textQuery=${textQuery}&nextPageToken=${encodeURIComponent(currentToken)}`;
+        const nextResponse = await fetch(nextUrl);
+        if (!nextResponse.ok) {
+          throw new Error(`HTTP error! status: ${nextResponse.status}`);
         }
-        return response.json();
-      })
-      .then((data: { places: Place[]; nextPageToken?: string }) => {
-        setPlaces(data.places);
-        setNextPageToken(data.nextPageToken || null);
-        setLoading(false);
-      })
-      .catch((err: Error) => {
-        setError(err);
-        setLoading(false);
-      });
-  };
-
-  const handleLoadMore = () => {
-    if (!nextPageToken) return;
-
-    setLoadingMore(true);
-    setError(null);
-
-    const url = `${import.meta.env.VITE_API_URL}api/maps/search/?textQuery=${textQuery}&location=${location}&radius=${radius}&nextPageToken=${encodeURIComponent(nextPageToken)}`;
-
-    fetch(url)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then((data: { places: Place[]; nextPageToken?: string }) => {
-        setPlaces([...places, ...data.places]);
-        setNextPageToken(data.nextPageToken || null);
-        setLoadingMore(false);
-      })
-      .catch((err: Error) => {
-        setError(err);
-        setLoadingMore(false);
-      });
+        const nextData: { places: Place[]; nextPageToken?: string } = await nextResponse.json();
+  
+        allPlaces = [...allPlaces, ...nextData.places];
+        currentToken = nextData.nextPageToken || null;
+  
+        // If your API needs a delay between nextPageToken fetches (Google sometimes does), you can uncomment this:
+        // await new Promise(resolve => setTimeout(resolve, 2000));
+      }
+  
+      setPlaces(allPlaces);
+      setNextPageToken(null); // No more pages
+      setLoading(false);
+    } catch (err) {
+      setError(err as Error);
+      setLoading(false);
+    }
   };
 
   const handleVatSubmit = async (placeId: string, vatValue: string, website?: string) => {
@@ -181,7 +170,7 @@ export default function MainContent() {
     <main className="">
       <h1 className="text-4xl font-semibold mt-12 mb-8">Google Maps Zoeken</h1>
       <div className="flex items-end space-x-5">
-        <div className="w-1/4">
+        <div className="w-1/3">
           <p className="text-sm my-2">Zoekwoorden</p>
           <input
             className="box-border h-10 rounded-md border border-gray-300 w-full m-0 text-sm"
@@ -189,26 +178,6 @@ export default function MainContent() {
             placeholder="aannemer, bouwbedrijf, ..."
             value={textQuery}
             onChange={(e) => setTextQuery(e.target.value)}
-          />
-        </div>
-        <div className="w-1/5">
-          <p className="text-sm my-2">Plaats</p>
-          <input
-            className="box-border h-10 rounded-md border border-gray-300 w-full m-0 text-sm"
-            type="text"
-            placeholder="Antwerpen"
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-          />
-        </div>
-        <div className="w-28">
-          <p className="text-sm my-2">Radius (km)</p>
-          <input
-            className="box-border h-10 rounded-md border border-gray-300 w-full m-0 text-sm"
-            type="text"
-            placeholder="50"
-            value={radius}
-            onChange={(e) => setRadius(e.target.value)}
           />
         </div>
         <div>
@@ -223,18 +192,25 @@ export default function MainContent() {
       </div>
       {error && <div className="error">Er is een fout opgetreden: {error.message}</div>}
 
-      <BatchButton 
-        rowSelection={rowSelection}
-        lists={lists}
-        onAdd={handleAddToList}
-      />
-
-      <PlacesTable
-          places={places}
-          onVatSubmit={handleVatSubmit}
-          rowSelection={rowSelection}
-          setRowSelection={setRowSelection}
-      />
+      {loading ? (
+        <div className="flex justify-center items-center h-64">
+          <div className="w-12 h-12 border-4 border-gray-300 border-t-blue-600 rounded-full animate-spin" />
+        </div>
+      ) : (
+        <div>
+          <BatchButton 
+            rowSelection={rowSelection}
+            lists={lists}
+            onAdd={handleAddToList}
+          />
+          <PlacesTable
+              places={places}
+              onVatSubmit={handleVatSubmit}
+              rowSelection={rowSelection}
+              setRowSelection={setRowSelection}
+          />
+        </div>
+      )}
       <div className="flex justify-center mt-7">
       {nextPageToken && !loading && (
         loadingMore ? (

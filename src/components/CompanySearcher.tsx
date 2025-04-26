@@ -19,18 +19,12 @@ type Company = {
   addresses?: Address[];
 };
 
-type List = {
-  id: string;
-  name: string;
-};
-
 export default function CompanySearcher() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const initialQuery = searchParams.get('q') || '';
   const [textQuery, setTextQuery] = useState<string>(initialQuery);
   const [companies, setCompanies] = useState<Company[]>([]);
-  const [lists, setLists] = useState<List[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
   const [rowSelection, setRowSelection] = useState({});
@@ -95,27 +89,6 @@ export default function CompanySearcher() {
     fetchCompanies(debouncedQuery);
   }, [debouncedQuery, navigate, initialQuery]);
 
-  useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL}api/lists/`)
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error('Failed to fetch lists');
-        }
-        return res.json();
-      })
-      .then((data) => {
-        // Convert from API format to expected shape for BatchButton
-        const formatted = data.map((list: any) => ({
-          id: list.slug,
-          name: list.name,
-        }));
-        setLists(formatted);
-      })
-      .catch((err) => {
-        console.error('Error fetching lists:', err);
-      });
-  }, []);
-
   const handleSearch = () => {
     navigate(`/company-search/?q=${textQuery}`);
     fetchCompanies(textQuery);
@@ -176,7 +149,6 @@ export default function CompanySearcher() {
 
       <BatchButton 
         rowSelection={rowSelection}
-        lists={lists}
         onAdd={handleAddToList}
       />
       

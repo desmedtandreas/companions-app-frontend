@@ -217,22 +217,24 @@ if (loading || !companyInfo) {
   return (
     <main>
       <div className='flex align-center justify-between mt-12'>
-        <div className='flex items-center'>
-          <h1 className='text-4xl font-semibold'>{companyInfo.name}</h1>
+        <div className='flex items-center overflow-hidden'>
+          <h1 className='text-4xl font-semibold truncate overflow-hidden whitespace-nowrap min-w-0'>{companyInfo.name}</h1>
           <h1 className='text-4xl font-light text-slate-400 ml-2'>{companyInfo.legalform_short}</h1>
-          <Badge className='ml-5' variant="success">
+          <Badge className='m-5' variant="success">
             {companyInfo.status}
           </Badge>
         </div>
         {companyInfo.fin_fetch && (
-        <div className='flex items-center'>
-          <span className='text-xs text-gray-400'>
-            Laatste synchronisatie: {companyInfo.fin_fetch}
+        <div className='items-center hidden md:flex'>
+
+          <span className='text-xs text-right text-gray-400'>
+            Synchronisatie: <br />{companyInfo.fin_fetch}
           </span>
           <RiLoopLeftFill 
-            className='w-4 h- ml-2 cursor-pointer text-green-500'
+            className='w-4 h- ml-3 cursor-pointer text-green-500'
             onClick={syncFinancials}
           />
+          
         </div>
       )}
       </div>
