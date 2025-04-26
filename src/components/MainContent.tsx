@@ -200,7 +200,6 @@ export default function MainContent() {
         <div>
           <BatchButton 
             rowSelection={rowSelection}
-            lists={lists}
             onAdd={handleAddToList}
           />
           <PlacesTable
@@ -211,17 +210,6 @@ export default function MainContent() {
           />
         </div>
       )}
-      <div className="flex justify-center mt-7">
-      {nextPageToken && !loading && (
-        loadingMore ? (
-          <div className="spinner" />
-        ) : (
-          <button className="bg-[#21284f] text-white rounded-full py-2 px-4" type="button" onClick={handleLoadMore}>
-            Meer laden...
-          </button>
-        )
-      )}
-      </div>
     </main>
   );
 }
