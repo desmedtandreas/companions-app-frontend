@@ -20,9 +20,12 @@ interface BatchButtonProps {
     rowSelection: Record<string, unknown>;
     text?: string;
     onAdd: (listSlug: string) => void;
+    useDelete: boolean;
+    onDelete?: () => void;
+    
 }
 
-function BatchButton({ rowSelection, text, onAdd }: BatchButtonProps) {
+function BatchButton({ rowSelection, text, onAdd, useDelete, onDelete }: BatchButtonProps) {
     const [selectedListSlug, setSelectedListSlug] = useState<string | undefined>(undefined);
     const [selectOpen, setSelectOpen] = useState(false);
     const [lists, setLists] = useState<List[]>([]);
@@ -38,7 +41,9 @@ function BatchButton({ rowSelection, text, onAdd }: BatchButtonProps) {
         ? 'flex-shrink-0 flex items-center text-sm text-white bg-[#21284f] h-9 px-4 rounded-md shadow cursor-pointer'
         : 'flex-shrink-0 flex items-center text-sm text-gray-400 bg-gray-200 h-9 px-4 rounded-md shadow cursor-not-allowed';
 
-        
+    const deleteButtonClass = isEnabled
+        ? 'flex items-center bg-red-500 rounded-md shadow px-4 py-2 text-white text-sm h-[40px] cursor-pointer'
+        : 'flex items-center bg-gray-200 rounded-md shadow px-4 py-2 text-gray-400 text-sm h-[40px] cursor-not-allowed';
     const fetchLists = async () => {
         try {
             const response = await fetch(`${import.meta.env.VITE_API_URL}api/lists/`);
@@ -97,8 +102,16 @@ function BatchButton({ rowSelection, text, onAdd }: BatchButtonProps) {
 
     return (
         <div>
-            <div className='flex items-center mt-10 mb-4'>
-                <div className='flex items-center w-[450px] p-1 bg-gray-100 rounded-lg shadow border-gray-200 border space-x-1'>
+            <div className='flex items-center space-x-2'>
+                {useDelete && (
+                    <div 
+                        className={deleteButtonClass} 
+                        onClick={isEnabled ? onDelete : undefined}
+                    >
+                        Verwijder
+                    </div>
+                )}
+                <div className='flex items-center w-[450px] p-1 bg-gray-100 rounded-md shadow border-gray-200 border space-x-1'>
                     <div 
                         className={buttonClass}
                         onClick={isEnabled ? handleAdd : undefined}

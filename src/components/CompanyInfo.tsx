@@ -59,6 +59,7 @@ type KPI = {
   equity: number | null;
   turnover: number | null;
   margin: number | null;
+  ebitda: number | null;
   profit: number | null;
   net_debt: number | null;
   capex: number | null;
@@ -94,13 +95,6 @@ export default function CompanyInfo() {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
   const [financialError, setFinancialError] = useState<Error | null>(null);
-
-  const metrics = [
-    { code: "21/28", label: "Activa", prefix: "€", align: "left" },
-    { code: "9901", label: "Winst", prefix: "€", align: "left" },
-    { code: "17/49", label: "Schulden", prefix: "€", align: "left" },
-    { code: "1001", label: "Werknemers", suffix: "FTE", align: "left" },
-  ]
 
   const kpi = [
     { tag: "equity", label: "Eigen Vermogen", prefix: "€" },

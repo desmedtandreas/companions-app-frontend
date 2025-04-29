@@ -147,10 +147,14 @@ export default function CompanySearcher() {
         </div>
       </div>
 
-      <BatchButton 
-        rowSelection={rowSelection}
-        onAdd={handleAddToList}
-      />
+      <div className="mt-10 mb-3">
+        <BatchButton 
+          rowSelection={rowSelection}
+          onAdd={handleAddToList}
+          useDelete={false}
+        />
+      </div>
+
       
       {error && (
         <div className="error">

@@ -198,10 +198,13 @@ export default function MainContent() {
         </div>
       ) : (
         <div>
-          <BatchButton 
-            rowSelection={rowSelection}
-            onAdd={handleAddToList}
-          />
+          <div className="mt-10 mb-3">
+            <BatchButton 
+              rowSelection={rowSelection}
+              onAdd={handleAddToList}
+              useDelete={false}
+            />
+          </div>
           <PlacesTable
               places={places}
               onVatSubmit={handleVatSubmit}
