@@ -6,17 +6,6 @@ import DeleteListDialog from "../components/DeleteListDialog";
 import DeleteCompanyDialog from "../components/DeleteCompanyDialog";
 import UpdateListDialog from "../components/UpdateListDialog";
 import { useToast } from "../components/ToastProvider";
-import {
-    Table,
-    TableBody,
-    TableCaption,
-    TableCell,
-    TableFoot,
-    TableHead,
-    TableHeaderCell,
-    TableRoot,
-    TableRow,
-} from "../components/Table";
 import BatchButton from "../components/BatchButton";
 import ListCompanyTable from "../components/ListCompanyTable";
 
@@ -76,23 +65,27 @@ export function formatDateTime(isoDate: string | undefined): string {
     });
   }
 
-  export function formatDateTimeShort(isoDate: string | undefined): JSX.Element {
-    if (!isoDate) return <></>;
-  
-    const date = new Date(isoDate);
-  
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const year = date.getFullYear();
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-  
-    return (
-      <>
-        {day}/{month}/{year}<br />{hours}:{minutes}
-      </>
-    );
-  }  
+
+export function formatDateTimeShort(isoDate?: string): React.ReactElement | null {
+  if (!isoDate) return null;
+
+  const date = new Date(isoDate);
+  if (isNaN(date.getTime())) return null; // Handle invalid date
+
+  const day = date.getDate().toString().padStart(2, '0');
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const year = date.getFullYear();
+  const hours = date.getHours().toString().padStart(2, '0');
+  const minutes = date.getMinutes().toString().padStart(2, '0');
+
+  return (
+    <>
+      {day}/{month}/{year}
+      <br />
+      {hours}:{minutes}
+    </>
+  );
+}
   
 
 function List() {
@@ -249,8 +242,10 @@ function List() {
       };
 
       const handleExport = async () => {
+        if (!list) return;
+
         const selectedCompanyNumbers = Object.keys(rowSelection)
-          .map((rowId) => list?.items[parseInt(rowId)]?.company?.number)
+          .map((rowId) => list.items[parseInt(rowId)]?.company?.number)
           .filter(Boolean);
       
         const body = selectedCompanyNumbers.length > 0 ? { companies: selectedCompanyNumbers } : {};

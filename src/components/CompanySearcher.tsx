@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { RiMenuAddFill } from '@remixicon/react';
+import { RiMenuAddFill, RiSearchLine, RiDownloadLine, RiFolderOpenFill } from '@remixicon/react';
 import { useToast } from './ToastProvider';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./Tabs";
 import CompanyTable from './CompanyTable';
 import BatchButton from './BatchButton';
 
@@ -24,11 +25,21 @@ export default function CompanySearcher() {
   const [searchParams] = useSearchParams();
   const initialQuery = searchParams.get('q') || '';
   const [textQuery, setTextQuery] = useState<string>(initialQuery);
+  const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [excelColumnName, setExcelColumnName] = useState<string>("number");
   const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
   const [rowSelection, setRowSelection] = useState({});
   const { showToast } = useToast();
+
+  const parseVAT = (input: string): string => {
+    return input
+      .toUpperCase()
+      .replace(/^BE\s?/, "")
+      .replace(/\D/g, "");
+  };
 
   const fetchCompanies = (query: string) => {
     if (!query) return;
@@ -37,7 +48,7 @@ export default function CompanySearcher() {
     setError(null);
 
     const cleanedQuery = cleanQueryInput(query);
-    const url = `${import.meta.env.VITE_API_URL}api/companies/search/?q=${cleanedQuery}`;
+    const url = `${import.meta.env.VITE_API_URL}api/company-search/?q=${cleanedQuery}`;
     console.log('🔍 Fetching:', url);
 
     fetch(url)
@@ -89,6 +100,66 @@ export default function CompanySearcher() {
     fetchCompanies(debouncedQuery);
   }, [debouncedQuery, navigate, initialQuery]);
 
+  const handleExcelUpload = async (file: File | null, columnName: string) => {
+    if (!file) {
+      showToast('Selecteer een bestand.', 'info');
+      return;
+    }
+    
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("column", columnName);
+  
+    const res = await fetch(`${import.meta.env.VITE_API_URL}api/company-search/upload_excel/`, {
+      method: "POST",
+      body: formData,
+    });
+  
+    if (!res.ok) {
+      alert("Fout bij uploaden van Excel.");
+      return;
+    }
+  
+    const companies = await res.json();
+    setCompanies(companies);
+  };
+
+  const handleBulkSearch = async () => {
+    const raw = textAreaRef.current?.value || "";
+  
+    const numbers = raw
+      .split(/[\n,]+/)
+      .map((n) => parseVAT(n.trim()))
+      .filter((n) => n.length > 0);
+  
+    if (numbers.length === 0) {
+      alert("Voer geldige BTW-nummers in.");
+      return;
+    }
+  
+    setLoading(true);
+    setError(null);
+  
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}api/company-search/bulk/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ numbers }),
+      });
+  
+      if (!res.ok) throw new Error("Fout bij ophalen van bedrijven");
+  
+      const data: Company[] = await res.json();
+      setCompanies(data);
+      setRowSelection({});
+    } catch (err) {
+      console.error(err);
+      setError(err as Error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSearch = () => {
     navigate(`/company-search/?q=${textQuery}`);
     fetchCompanies(textQuery);
@@ -126,28 +197,107 @@ export default function CompanySearcher() {
 
   return (
     <main>
-      <h1 className="text-4xl font-semibold mt-12 mb-8">Bedrijf Zoeken</h1>
-      <div className="flex items-end space-x-5">
-        <div className="w-1/3">
-          <p className="text-sm my-2">Zoekwoorden</p>
-          <input
-            className="box-border h-10 rounded-md border border-gray-300 w-full m-0 text-sm"
-            type="text"
-            placeholder="Naam of BTW nummer"
-            value={textQuery}
-            onChange={(e) => setTextQuery(e.target.value)}
-          />
+      <Tabs defaultValue="tab1" className="mt-12">
+        <div className="flex items-center justify-between gap-8 mb-10">
+          <h1 className="text-4xl font-semibold">Bedrijven</h1>
+          <TabsList className="flex gap-2" variant="solid">
+            <TabsTrigger value="tab1">Zoeken</TabsTrigger>
+            <TabsTrigger value="tab2">Bulk Text</TabsTrigger>
+            <TabsTrigger value="tab3">Bulk File</TabsTrigger>
+          </TabsList>
         </div>
-        <div>
-          <button type="button" 
-            className="px-5 h-10 border border-[#21284f] bg-[#21284f] text-white rounded-full"
-            onClick={handleSearch}>
-            Zoeken
-          </button>
+        <TabsContent value="tab1">
+        <div className="flex items-end space-x-5">
+          <div className="w-1/3">
+            <p className="text-sm mb-2">Zoekwoorden</p>
+            <input
+              className="box-border h-10 rounded-md border border-gray-300 w-full m-0 text-sm"
+              type="text"
+              placeholder="Naam of BTW nummer"
+              value={textQuery}
+              onChange={(e) => setTextQuery(e.target.value)}
+            />
+          </div>
+          <div>
+            <button type="button" 
+              className="flex items-center px-7 h-10 border border-[#21284f] bg-[#21284f] text-white text-sm rounded-full mt-3"
+              onClick={handleSearch}>
+              <RiSearchLine className="w-4 mr-2 -ml-1" />
+              Zoeken
+            </button>
+          </div>
         </div>
-      </div>
+        </TabsContent>
+        <TabsContent value="tab2">
+            <div className="w-full">
+              <p className="text-sm mb-2">Zoekwoorden</p>
+              <textarea
+                ref={textAreaRef}
+                className="box-border h-24 rounded-md border border-gray-300 w-full m-0 text-sm"
+                placeholder="Lijst aan BTW nummers, gescheiden door een spatie, comma of nieuwe regel"
+              />
+            </div>
+            <div>
+              <button type="button" 
+                className="flex items-center px-7 h-10 border border-[#21284f] bg-[#21284f] text-white text-sm rounded-full mt-3"
+                onClick={handleBulkSearch}>
+                <RiSearchLine className="w-4 mr-2 -ml-1" />
+                Zoeken
+              </button>
+            </div>
+          </TabsContent>
+          <TabsContent value="tab3" className="flex space-x-3 justify-start items-end">
+            <div className="w-1/4">
+              <p className="text-sm mb-2">Kolomnaam</p>
+              <input
+                type="text"
+                placeholder="Bijv. BTW nummer"
+                value={excelColumnName}
+                onChange={(e) => setExcelColumnName(e.target.value)}
+                className="box-border h-10 rounded-md border border-gray-300 w-full px-2 text-sm"
+              />
+            </div>
 
-      <div className="mt-10 mb-3">
+            <div className="w-1/3">
+              <p className="text-sm mb-2">Excel bestand</p>
+
+              <label className="block relative w-full cursor-pointer">
+                <div className="h-10 flex items-center text-sm">
+                  <div className="flex items-center px-4 h-full  bg-[#21284f] rounded-l-md text-white z-10">
+                    <RiFolderOpenFill className="w-4 mr-2" />
+                    Bladeren
+                  </div>
+                  <div className="w-full -ml-1 flex items-center pl-4 pr-5 h-full border border-gray-300 text-gray-500 font-normal z-0 rounded-md text-clip overflow-hidden whitespace-nowrap">
+                    {selectedFile?.name || 'Geen bestand gekozen'}
+                  </div>
+                </div>
+
+                <input
+                  type="file"
+                  accept=".xlsx,.xls"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setSelectedFile(file);
+                    }
+                  }}
+                  className="absolute inset-0 opacity-0 cursor-pointer"
+                />
+              </label>
+            </div>
+
+            <button
+              type="button"
+              className="flex items-center px-6 h-10 border border-[#21284f] bg-[#21284f] text-white text-sm rounded-full"
+              onClick={() => handleExcelUpload(selectedFile, excelColumnName)}
+            >
+              <RiDownloadLine className="w-4 mr-2 -ml-1" />
+              Importeren
+            </button>
+          </TabsContent>
+      </Tabs>
+
+      <div className="mt-12 mb-3">
         <BatchButton 
           rowSelection={rowSelection}
           onAdd={handleAddToList}
