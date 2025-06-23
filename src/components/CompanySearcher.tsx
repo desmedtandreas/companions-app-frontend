@@ -27,7 +27,7 @@ export default function CompanySearcher() {
   const [textQuery, setTextQuery] = useState<string>(initialQuery);
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [excelColumnName, setExcelColumnName] = useState<string>("number");
+  const [excelColumnName, setExcelColumnName] = useState<string | null>(null);
   const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
@@ -252,7 +252,7 @@ export default function CompanySearcher() {
               <input
                 type="text"
                 placeholder="Bijv. BTW nummer"
-                value={excelColumnName}
+                value={excelColumnName ?? ''}
                 onChange={(e) => setExcelColumnName(e.target.value)}
                 className="box-border h-10 rounded-md border border-gray-300 w-full px-2 text-sm"
               />
@@ -289,7 +289,13 @@ export default function CompanySearcher() {
             <button
               type="button"
               className="flex items-center px-6 h-10 border border-[#21284f] bg-[#21284f] text-white text-sm rounded-full"
-              onClick={() => handleExcelUpload(selectedFile, excelColumnName)}
+              onClick={() => {
+                if (excelColumnName) {
+                  handleExcelUpload(selectedFile, excelColumnName);
+                } else {
+                  showToast('Voer een kolomnaam in.', 'info');
+                }
+              }}
             >
               <RiDownloadLine className="w-4 mr-2 -ml-1" />
               Importeren

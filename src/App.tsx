@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { ToastProvider } from './components/ToastProvider';
 import Home from './pages/Home'
+import Heatmap from './pages/Heatmap'
 import MapsSearch from './pages/MapsSearch'
 import Company from './pages/Company'
 import CompanySearch from './pages/CompanySearch'
@@ -14,6 +15,7 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/heatmap" element={<Heatmap />} />
           <Route path="/company/:enterprise_number" element={<Company />} />
           <Route path="/maps-search" element={<MapsSearch />} />
           <Route path="/company-search" element={<CompanySearch />} />
